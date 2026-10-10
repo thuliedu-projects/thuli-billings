@@ -1,0 +1,15 @@
+---
+description: Core Thuli Billings standards — fast UI, simple modular architecture, light DB
+alwaysApply: true
+---
+
+# Thuli Billings — Core
+
+- Prioritize an **extremely fast**, user-friendly UI (especially POS billing).
+- Keep architecture **simple** and **modular**. Do not over-engineer.
+- Prefer feature folders over deep abstraction layers, shared “core frameworks”, or premature packages.
+- Keep the database **light** (SQLite local + Supabase remote). Avoid extra tables, warehouses, or sync complexity unless required.
+- Payments: Razorpay on the website only; the app only checks paid / subscription status.
+- Follow [ARCHITECTURE.md](../../ARCHITECTURE.md). Do not invent data models until the user provides them.
+- Stage order: scaffold → models → UI → sync → analytics/invoices → website.
+- Website: never add decorative gradient bubbles / radial tint blobs in backgrounds (see AGENTS.md).

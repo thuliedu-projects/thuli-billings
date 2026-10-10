@@ -1,0 +1,14 @@
+---
+description: Expo / React Native conventions for the mobile app
+globs: app/**
+alwaysApply: false
+---
+
+# Mobile (Expo)
+
+- Use **Expo Router** file routes under `app/app/`. Group by `(auth)`, `(pos)`, `(inventory)`, `(analytics)`, `(settings)`.
+- TypeScript strict; colocate feature logic in `src/features/<domain>/`.
+- Shared UI only in `src/components/`; domain UI stays in its feature.
+- Prefer local state and small hooks. Do not add Redux/MobX unless clearly needed.
+- POS screens must stay snappy: avoid blocking network on checkout; write SQLite first.
+- Do not build website or Razorpay checkout inside the mobile app.

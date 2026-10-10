@@ -1,0 +1,30 @@
+import { fonts } from './fonts';
+
+/** Brand tokens for THULI Billings UI (from mockups). */
+export const theme = {
+  purple: '#6B2D9B',
+  purpleDark: '#1E1630',
+  purpleMuted: '#8B7A9E',
+  purpleSoft: '#F3EAF8',
+  purpleBorder: '#D4C4E3',
+  purpleWave: '#E8D5F2',
+  gold: '#C9A227',
+  goldSoft: '#E8C84A',
+  white: '#FFFFFF',
+  background: '#FFFFFF',
+  backgroundMuted: '#F7F5FA',
+  card: '#FFFFFF',
+  text: '#1E1630',
+  textSecondary: '#8B7A9E',
+  textPlaceholder: '#A89BB5',
+  border: '#E2D8EC',
+  borderFocus: '#6B2D9B',
+  danger: '#E53935',
+  dangerSoft: '#FFEBEE',
+  warning: '#EF6C00',
+  warningSoft: '#FFF3E0',
+  success: '#2E7D32',
+  successSoft: '#E8F5E9',
+  shadow: '#6B2D9B',
+  font: fonts,
+} as const;

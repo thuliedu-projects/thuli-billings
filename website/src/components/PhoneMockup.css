@@ -1,0 +1,212 @@
+.phone-stage {
+  position: relative;
+  width: min(300px, 78vw);
+  margin: 0 auto;
+  animation: fade-up 0.9s ease 0.15s both;
+}
+
+.live-event {
+  position: absolute;
+  top: 22%;
+  left: -76px;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 166px;
+  padding: 11px 12px;
+  border: 1px solid color-mix(in srgb, var(--purple-border) 72%, white);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--white) 94%, transparent);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--shadow) 16%, transparent);
+  animation: live-event-in 0.45s ease both, live-card-float 3.2s ease-in-out infinite;
+}
+
+.live-event-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 14%, transparent);
+}
+
+.live-event-warning .live-event-dot {
+  background: var(--warning);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--warning) 15%, transparent);
+}
+
+.live-event-purple .live-event-dot {
+  background: var(--purple);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--purple) 14%, transparent);
+}
+
+.live-event-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.live-event-copy small,
+.live-event-copy strong,
+.live-event-copy em {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.live-event-copy small {
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.live-event-copy strong {
+  color: var(--purple-dark);
+  font-size: 0.78rem;
+}
+
+.live-event-copy em {
+  color: var(--purple);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.phone-device {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 9 / 19.2;
+  border-radius: 36px;
+  padding: 10px;
+  background: linear-gradient(145deg, #2a2038, #0f0b16 55%, #1e1630);
+  box-shadow:
+    0 30px 60px color-mix(in srgb, var(--shadow) 22%, transparent),
+    inset 0 0 0 2px #3d3350,
+    inset 0 0 0 5px #16101f;
+}
+
+.phone-notch {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  z-index: 2;
+  width: 38%;
+  height: 18px;
+  transform: translateX(-50%);
+  background: #0a0710;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.phone-screen {
+  height: 100%;
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--white);
+}
+
+.phone-home {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  width: 28%;
+  height: 4px;
+  transform: translateX(-50%);
+  background: color-mix(in srgb, var(--white) 35%, transparent);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.phone-hint {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: var(--text-secondary);
+}
+
+.phone-caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 18px;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+.phone-caption p,
+.phone-caption small {
+  margin: 0;
+}
+
+.phone-caption p {
+  color: var(--purple-dark);
+  font-weight: 750;
+}
+
+.phone-caption small {
+  padding-left: 5px;
+  border-left: 1px solid var(--purple-border);
+}
+
+.live-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 35%, transparent);
+  animation: live-pulse 1.8s ease-out infinite;
+}
+
+@keyframes live-event-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes live-card-float {
+  0%,
+  100% {
+    margin-top: 0;
+  }
+  50% {
+    margin-top: -5px;
+  }
+}
+
+@keyframes live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 35%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--success) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 0%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-event,
+  .live-pulse {
+    animation: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .live-event {
+    left: -12px;
+    top: 18%;
+    transform: scale(0.9);
+    transform-origin: left center;
+  }
+}
+

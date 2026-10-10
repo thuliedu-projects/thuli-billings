@@ -1,0 +1,15 @@
+---
+description: SQLite offline and Supabase sync conventions
+globs: app/src/db/**,app/src/features/sync/**,app/src/lib/**
+alwaysApply: false
+---
+
+# Data and sync
+
+- **SQLite** is the local source of truth for POS (inventory reads, carts, sales drafts, sync queue).
+- **Supabase** is the remote source of truth with RLS for multi-tenant / multi-store isolation.
+- Schema: [docs/DATA_MODEL.md](../../docs/DATA_MODEL.md); SQLite DDL in `app/src/db/schema.ts`; types in `app/src/types/`.
+- Pattern: local write → enqueue → push/pull when online. Do not block billing on sync.
+- Conflict handling: compare-and-swap on `revision`. `updated_at` is server receipt time. No CRDTs or multi-master designs.
+- Offline unpaid use: enforce `license_lease` (7-day grace); block new bills after expiry until online refresh.
+- App only **reads** subscription / paid status from Supabase; charging stays on the website.

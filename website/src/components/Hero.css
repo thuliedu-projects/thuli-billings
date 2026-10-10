@@ -1,0 +1,139 @@
+.hero {
+  position: relative;
+  min-height: min(100vh, 920px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.hero-atmosphere {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(165deg, #faf8fc 0%, #f3eaf8 48%, #f7f5fa 100%);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(var(--max-width), calc(100% - 48px));
+  margin: 0 auto;
+  padding: 88px 0 64px;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.hero-copy {
+  animation: fade-up 0.75s ease both;
+}
+
+.hero-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.hero-logo {
+  width: min(220px, 70vw);
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--shadow) 18%, transparent);
+}
+
+.hero-wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.28em;
+  color: var(--purple);
+  text-transform: uppercase;
+}
+
+.hero-gold-rule {
+  width: 72px;
+  height: 3px;
+  margin: 18px 0 22px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-soft), transparent);
+}
+
+.hero-headline {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.1rem, 4.4vw, 3.35rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--purple-dark);
+  max-width: 14ch;
+}
+
+.hero-support {
+  margin: 0 0 28px;
+  max-width: 36ch;
+  font-size: 1.08rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  border-radius: 14px;
+  background: var(--purple);
+  color: var(--white);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--shadow) 28%, transparent);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.hero-cta:hover {
+  background: color-mix(in srgb, var(--purple) 88%, black);
+  transform: translateY(-2px);
+}
+
+.hero-visual {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 860px) {
+  .hero {
+    min-height: auto;
+  }
+
+  .hero-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 72px 0 48px;
+    text-align: center;
+  }
+
+  .hero-brand {
+    align-items: center;
+  }
+
+  .hero-gold-rule {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-headline {
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-support {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

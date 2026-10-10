@@ -1,0 +1,16 @@
+node_modules/
+.expo/
+dist/
+web-build/
+.env
+.env*.local
+*.tsbuildinfo
+.DS_Store
+
+# Local-only: agent skill copies and design mockups
+.agents/
+skills-lock.json
+mockup-ui/
+
+# Supabase CLI local link state
+supabase/.temp/
