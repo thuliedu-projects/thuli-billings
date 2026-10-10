@@ -67,6 +67,26 @@ export const PLANS: Plan[] = [
   },
 ];
 
+export type EntitlementShape = Plan['entitlements'];
+
+export function entitlementFeatures(
+  entitlements: EntitlementShape,
+): { label: string; included: boolean }[] {
+  const products =
+    entitlements.maxProducts == null ? 'Unlimited products' : `${entitlements.maxProducts} products`;
+  const stores = entitlements.maxStores === 1 ? '1 store' : `${entitlements.maxStores} stores`;
+  return [
+    { label: 'Fast POS billing', included: true },
+    { label: 'Offline selling', included: true },
+    { label: stores, included: true },
+    { label: `${entitlements.maxStaff} staff seats`, included: true },
+    { label: products, included: true },
+    { label: 'Sales analytics', included: entitlements.analytics },
+    { label: 'Invoices', included: entitlements.invoices },
+    { label: 'Priority support', included: entitlements.prioritySupport },
+  ];
+}
+
 export function formatInr(amount: number): string {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',

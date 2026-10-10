@@ -18,7 +18,7 @@ export function SiteNav() {
           <div className="site-nav-auth">
             {session ? (
               <NavLink to="/account" className={({ isActive }) => (isActive ? 'active' : undefined)}>
-                Account
+                Dashboard
               </NavLink>
             ) : (
               <NavLink to="/login" className={({ isActive }) => (isActive ? 'active' : undefined)}>

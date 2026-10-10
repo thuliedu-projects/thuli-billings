@@ -150,7 +150,7 @@ export function CheckoutPage() {
             ) : null}
             {paid ? (
               <p className="checkout-success" role="status">
-                Payment recorded. You can <Link to="/account">view it on your account</Link> and sign
+                Payment recorded. You can <Link to="/account">open your dashboard</Link> and sign
                 in to the app with {phoneLabel || 'this number'}.
               </p>
             ) : (

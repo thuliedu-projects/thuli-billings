@@ -1,56 +1,124 @@
 .account-page {
   min-height: calc(100vh - 56px);
-  display: grid;
-  place-items: center;
-  padding: 40px 20px;
+  padding: 28px 20px 56px;
   background: linear-gradient(165deg, #faf8fc 0%, #f3eaf8 55%, #f7f5fa 100%);
 }
 
-.account-card {
-  width: min(640px, 100%);
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 36px 28px 28px;
-  box-shadow: 0 18px 40px color-mix(in srgb, var(--shadow) 10%, transparent);
+.account-shell {
+  width: min(1040px, 100%);
+  margin: 0 auto;
+}
+
+.account-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.account-head-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
 }
 
 .account-logo {
-  display: block;
-  width: min(180px, 60%);
+  width: 72px;
   height: auto;
-  margin: 0 auto 12px;
-  object-fit: contain;
   border-radius: 8px;
+  flex: none;
 }
 
-.account-gold-rule {
-  width: 56px;
-  height: 3px;
-  margin: 0 auto 18px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
-
-.account-card h1 {
+.account-head h1 {
   margin: 0;
-  text-align: center;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.65rem;
+  font-size: clamp(1.45rem, 2vw, 1.85rem);
   letter-spacing: -0.03em;
   color: var(--purple-dark);
 }
 
 .account-sub {
-  margin: 8px 0 20px;
-  text-align: center;
+  margin: 4px 0 0;
   color: var(--text-secondary);
 }
 
+.account-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.account-org-switch select,
+.dash-form input,
+.dash-form textarea,
+.dash-inline-form input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--white);
+  color: var(--text);
+  font: inherit;
+}
+
+.dash-form textarea {
+  resize: vertical;
+}
+
+.account-org-switch select:focus,
+.dash-form input:focus,
+.dash-form textarea:focus,
+.dash-inline-form input:focus {
+  outline: 2px solid var(--purple);
+  border-color: var(--purple);
+}
+
+.account-tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.account-tab {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--text-secondary);
+  font: inherit;
+  font-weight: 700;
+  padding: 10px 14px;
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+
+.account-tab[aria-selected='true'] {
+  color: var(--purple);
+  border-bottom-color: var(--purple);
+}
+
+.account-signout,
+.dash-text-button {
+  border: 0;
+  background: none;
+  color: var(--purple);
+  font: inherit;
+  font-weight: 700;
+  padding: 0;
+}
+
+.account-error {
+  color: var(--danger);
+  margin: 0 0 12px;
+}
+
 .account-banner,
-.account-pay {
-  margin: 0 0 18px;
+.dash-callout {
+  margin: 0;
   border-radius: 14px;
   padding: 14px 16px;
 }
@@ -60,114 +128,329 @@
   background: color-mix(in srgb, var(--success) 8%, white);
 }
 
-.account-pay {
+.dash-callout {
   background: var(--purple-soft);
 }
 
-.account-pay h2,
-.account-plan h2,
-.account-history h2 {
-  margin: 0 0 8px;
-  font-size: 1rem;
+.dash-callout h2,
+.dash-panel h2,
+.dash-plan-card h3,
+.dash-business-name h2 {
+  margin: 0;
   color: var(--purple-dark);
+  font-size: 1.15rem;
 }
 
-.account-pay p,
-.account-muted {
-  margin: 0;
+.dash-callout p,
+.dash-note {
+  margin: 8px 0 0;
   color: var(--text-secondary);
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
-.account-pay-link {
-  display: inline-flex;
-  margin-top: 12px;
-  padding: 10px 16px;
-  border-radius: 12px;
-  background: var(--purple);
-  color: var(--white);
-  font-weight: 700;
-}
-
-.account-error {
-  color: var(--danger);
-}
-
-.account-plan,
-.account-history {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-}
-
-.account-plan dl {
+.dash-stack {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 0;
+  gap: 14px;
 }
 
-.account-plan dt {
-  color: var(--text-secondary);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+.dash-panel,
+.dash-plan-card,
+.dash-callout {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
 }
 
-.account-plan dd {
-  margin: 2px 0 0;
-  color: var(--purple-dark);
-  font-weight: 700;
-}
-
-.account-history ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 10px;
-}
-
-.account-history li {
+.dash-panel-head,
+.dash-business-name,
+.dash-form-actions {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
 }
 
-.account-history li div {
+.dash-kicker {
+  margin: 0 0 4px;
+  color: var(--gold);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dash-pill {
+  flex: none;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: var(--background-muted);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.dash-pill.is-good {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 10%, white);
+}
+
+.dash-stats,
+.dash-details {
   display: grid;
-  gap: 2px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 16px 0 0;
 }
 
-.account-history li div:last-child {
-  text-align: right;
+.dash-details {
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 12px;
 }
 
-.account-history strong {
+.dash-stats dt,
+.dash-details dt {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dash-stats dd,
+.dash-details dd {
+  margin: 4px 0 0;
   color: var(--purple-dark);
+  font-weight: 800;
 }
 
-.account-history span {
+.dash-stats span,
+.dash-payments span {
   color: var(--text-secondary);
   font-size: 0.85rem;
 }
 
-.account-signout {
-  margin-top: 22px;
-  border: 0;
-  background: none;
-  color: var(--purple);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
+.dash-chips,
+.dash-feature-list,
+.dash-store-mini,
+.dash-payments {
+  list-style: none;
+  margin: 12px 0 0;
   padding: 0;
 }
 
-@media (max-width: 560px) {
-  .account-plan dl {
+.dash-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dash-chips li {
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.dash-store-mini,
+.dash-payments {
+  display: grid;
+  gap: 10px;
+}
+
+.dash-store-mini li,
+.dash-payments li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.dash-store-mini li {
+  display: grid;
+  grid-template-columns: 1.4fr auto 1.6fr;
+  align-items: baseline;
+}
+
+.dash-store-mini strong,
+.dash-payments strong {
+  color: var(--purple-dark);
+}
+
+.dash-payments li div {
+  display: grid;
+  gap: 2px;
+}
+
+.dash-payments li div:last-child {
+  text-align: right;
+}
+
+.dash-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+.dash-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.dash-plan-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.dash-plan-card.is-current {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 1px var(--purple);
+}
+
+.dash-plan-card.is-recommended {
+  background: var(--purple-soft);
+}
+
+.dash-plan-badge,
+.dash-current-label {
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.dash-plan-badge {
+  background: var(--gold);
+  color: var(--purple-dark);
+}
+
+.dash-current-label {
+  margin-top: auto;
+  background: var(--purple);
+  color: var(--white);
+}
+
+.dash-plan-price {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--purple-dark);
+}
+
+.dash-plan-price small {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.dash-feature-list {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+
+.dash-feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.dash-feature-list .is-on {
+  color: var(--purple-dark);
+}
+
+.dash-feature-list .is-off {
+  color: var(--text-secondary);
+}
+
+.dash-plan-card .dash-button,
+.dash-plan-card .dash-current-label {
+  margin-top: auto;
+}
+
+.dash-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: var(--purple);
+  color: var(--white);
+  font: inherit;
+  font-weight: 700;
+}
+
+.dash-button:disabled {
+  opacity: 0.7;
+}
+
+.dash-meter {
+  height: 8px;
+  margin-top: 14px;
+  border-radius: 999px;
+  background: var(--purple-soft);
+  overflow: hidden;
+}
+
+.dash-meter span {
+  display: block;
+  height: 100%;
+  background: var(--purple);
+}
+
+.dash-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.dash-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--purple-dark);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.dash-check {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.dash-check input {
+  width: auto;
+}
+
+.dash-inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.dash-inline-form input {
+  width: min(280px, 100%);
+}
+
+@media (max-width: 800px) {
+  .dash-stats,
+  .dash-plan-grid,
+  .dash-store-mini li {
     grid-template-columns: 1fr;
+  }
+
+  .account-head {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

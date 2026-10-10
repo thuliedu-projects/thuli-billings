@@ -38,17 +38,17 @@ Deno.serve(async (req) => {
     return json(503, { error: "Razorpay is not connected yet." });
   }
 
-  const expected = paymentSignature(orderId, paymentId, keys.keySecret);
-  if (!signaturesMatch(signature, expected)) {
-    return json(400, { error: "Payment could not be verified." });
-  }
-
   const phone = toE164(auth.user.phone);
   if (!phone) {
     return json(400, { error: "Sign in with your mobile number before paying." });
   }
 
   try {
+    const expected = paymentSignature(orderId, paymentId, keys.keySecret);
+    if (!signaturesMatch(signature, expected)) {
+      return json(400, { error: "Payment could not be verified." });
+    }
+
     const payment = await fetchPayment(keys.keyId, keys.keySecret, paymentId);
     if (payment.status !== "captured") {
       return json(409, { error: "Payment is not completed yet." });
