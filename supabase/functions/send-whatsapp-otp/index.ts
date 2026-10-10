@@ -111,13 +111,13 @@ export default {
       return jsonError(400, "Hook payload is missing a phone number or OTP");
     }
 
-    try {
-      await sendWhatsAppOtp(phone, otp);
-    } catch (error) {
+    // Auth drops the hook after 5 seconds. WhatsApp often takes longer, so
+    // acknowledge first and send after the response.
+    const sending = sendWhatsAppOtp(phone, otp).catch((error) => {
       const message = error instanceof Error ? error.message : "WhatsApp send failed";
       console.error(`WhatsApp send failed: ${message}`);
-      return jsonError(500, message);
-    }
+    });
+    EdgeRuntime.waitUntil(sending);
 
     return Response.json({});
   }),
