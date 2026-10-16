@@ -19,7 +19,20 @@ import './AdminPage.css';
 
 type AdminTab = 'analytics' | 'plans';
 
-let googleCodeExchange: Promise<void> | null = null;
+let googleSignIn: Promise<void> | null = null;
+
+function callbackSession(): { accessToken: string; refreshToken: string } | null {
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const accessToken = hash.get('access_token');
+  const refreshToken = hash.get('refresh_token');
+  if (!accessToken || !refreshToken) return null;
+  return { accessToken, refreshToken };
+}
+
+function hasAuthCallback(): boolean {
+  if (callbackSession()) return true;
+  return new URLSearchParams(window.location.search).has('code');
+}
 
 export function AdminPage() {
   const { ready, session, signOut } = useAuth();
@@ -31,19 +44,25 @@ export function AdminPage() {
   const [error, setError] = useState('');
   const [authError, setAuthError] = useState('');
   const [signingIn, setSigningIn] = useState(false);
+  const [finishingSignIn, setFinishingSignIn] = useState(hasAuthCallback);
 
   const tab: AdminTab = params.get('tab') === 'plans' ? 'plans' : 'analytics';
 
   useEffect(() => {
     if (!supabase) return;
+    const fromHash = callbackSession();
     const code = new URLSearchParams(window.location.search).get('code');
-    if (!code) return;
-    if (!googleCodeExchange) {
-      googleCodeExchange = supabase.auth.exchangeCodeForSession(code).then(({ error: exchangeError }) => {
-        if (exchangeError) setAuthError(exchangeError.message);
-        window.history.replaceState({}, '', '/admin');
-      });
-    }
+    if (!fromHash && !code) return;
+    if (googleSignIn) return;
+    window.history.replaceState({}, '', '/admin');
+    const client = supabase;
+    googleSignIn = (fromHash
+      ? client.auth.setSession({ access_token: fromHash.accessToken, refresh_token: fromHash.refreshToken })
+      : client.auth.exchangeCodeForSession(code ?? '')
+    ).then(({ error: signInError }) => {
+      if (signInError) setAuthError(signInError.message);
+      setFinishingSignIn(false);
+    });
   }, []);
 
   useEffect(() => {
@@ -114,14 +133,14 @@ export function AdminPage() {
           ) : null}
         </header>
 
-        {access === 'loading' ? <p className="dash-note">Checking access…</p> : null}
+        {finishingSignIn || access === 'loading' ? <p className="dash-note">Signing you in…</p> : null}
         {access === 'missing' ? (
           <p className="account-error" role="alert">
             Operator access is not on this database yet. Apply the platform admin migration, then add your Google email
             to platform_admins.
           </p>
         ) : null}
-        {access === 'no' ? (
+        {access === 'no' && !finishingSignIn ? (
           <section className="dash-panel admin-gate">
             <h2>Operator sign-in</h2>
             <p className="dash-note">
