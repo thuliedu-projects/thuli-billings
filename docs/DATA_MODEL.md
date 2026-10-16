@@ -75,7 +75,8 @@ sequenceDiagram
 
 | Table | Key fields |
 | --- | --- |
-| `plans` | `code`, `name`, `price_paise`, `interval` (`month`/`year`), `is_active`, `sort_order` |
+| `plans` | `code`, `name`, `price_paise`, `interval` (`month`/`year`), `blurb`, `recommended` (at most one), `is_active`, `sort_order` |
+| `platform_admins` | operator email allowlist (`email` primary key, stored lowercase). No client read or write |
 | `plan_entitlements` | `plan_id` (unique), `max_stores`, `max_staff`, `max_products` (null = unlimited), `analytics`, `invoices`, `priority_support` |
 | `subscriptions` | one row per org (`org_id` unique): `plan_id`, `status`, period bounds, Razorpay ids |
 | `payment_events` | webhook audit: `org_id`, `owner_phone` (checkout mobile), `event_type`, `razorpay_event_id` (unique), amounts, payload |
@@ -120,7 +121,9 @@ Mutable catalog and bill rows share `id` (uuid), `revision`, `created_at`, `upda
 - New bills are rejected unless `now()` is within `current_period_end + 7 days`. `received_at` is server time.
 - Tombstone insert and update: owner/admin/manager. Cashiers can still insert bills and stock movements.
 - Cross-store FKs: product↔category, stock↔product, bill_item↔product must share `store_id`. `store_id` cannot be changed after insert.
-- `plans` / `plan_entitlements`: SELECT for authenticated.
+- `plans` / `plan_entitlements`: SELECT for authenticated. Anonymous SELECT is limited to active plans and their entitlements. Platform admins may UPDATE both. `code` and `interval` cannot change. No client insert or delete of plans.
+- `platform_admins`: operator emails only. `am_platform_admin()` is true when the session has a Google identity whose email is on that list. A phone session does not qualify. `platform_snapshot()` returns operator analytics and refuses everyone else.
+- Platform admins may SELECT all organizations, profiles, members, subscriptions, stores, and payment events. They cannot change customer rows. Bill rows stay inside `platform_snapshot()`; there is no client SELECT policy on bills for operators.
 - `subscriptions`: member SELECT; `payment_events`: owner/admin SELECT; writes service role only.
 - Client roles: `SELECT/INSERT/UPDATE/DELETE` only (no `TRUNCATE`).
 
@@ -175,7 +178,7 @@ Adjust via data, not migrations.
 
 ## Related files
 
-- Supabase: [`supabase/migrations/0001_init.sql`](../supabase/migrations/0001_init.sql), [`supabase/migrations/20260921170522_owner_phone_on_payment.sql`](../supabase/migrations/20260921170522_owner_phone_on_payment.sql), [`supabase/migrations/20260921170818_rls_hardening.sql`](../supabase/migrations/20260921170818_rls_hardening.sql), [`supabase/migrations/20260921172120_delete_own_account.sql`](../supabase/migrations/20260921172120_delete_own_account.sql), [`supabase/migrations/20260921172526_delete_own_account_private.sql`](../supabase/migrations/20260921172526_delete_own_account_private.sql), [`supabase/migrations/20261003141500_pos_integrity.sql`](../supabase/migrations/20261003141500_pos_integrity.sql)
+- Supabase: [`supabase/migrations/0001_init.sql`](../supabase/migrations/0001_init.sql), [`supabase/migrations/20260921170522_owner_phone_on_payment.sql`](../supabase/migrations/20260921170522_owner_phone_on_payment.sql), [`supabase/migrations/20260921170818_rls_hardening.sql`](../supabase/migrations/20260921170818_rls_hardening.sql), [`supabase/migrations/20260921172120_delete_own_account.sql`](../supabase/migrations/20260921172120_delete_own_account.sql), [`supabase/migrations/20260921172526_delete_own_account_private.sql`](../supabase/migrations/20260921172526_delete_own_account_private.sql), [`supabase/migrations/20261003141500_pos_integrity.sql`](../supabase/migrations/20261003141500_pos_integrity.sql), [`supabase/migrations/20261016213000_platform_admin.sql`](../supabase/migrations/20261016213000_platform_admin.sql)
 - Types: [`app/src/types/`](../app/src/types/)
 - SQLite: [`app/src/db/schema.ts`](../app/src/db/schema.ts)
 - Architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md)

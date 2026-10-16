@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 
-import { PLANS, formatInr, type Plan, type PlanCode } from '../data/plans';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { loadCatalogPlans, localCatalogPlans, type CatalogPlan } from '../lib/account';
+import { formatPaise } from '../lib/money';
 import './Pricing.css';
 
 type CellValue = boolean | string;
 
 type CompareRow = {
   label: string;
-  values: Record<PlanCode, CellValue>;
+  values: Record<string, CellValue>;
 };
 
 type CompareSection = {
@@ -18,41 +19,30 @@ type CompareSection = {
   rows: CompareRow[];
 };
 
-function productsLabel(plan: Plan): string {
+function productsLabel(plan: CatalogPlan): string {
   const n = plan.entitlements.maxProducts;
   return n == null ? 'Unlimited' : String(n);
 }
 
-function buildCompareSections(plans: Plan[]): CompareSection[] {
-  const byCode = Object.fromEntries(plans.map((p) => [p.code, p])) as Record<PlanCode, Plan>;
-
-  const bool = (pick: (p: Plan) => boolean): Record<PlanCode, CellValue> => ({
-    starter: pick(byCode.starter),
-    growth: pick(byCode.growth),
-    pro: pick(byCode.pro),
-  });
-
-  const text = (pick: (p: Plan) => string): Record<PlanCode, CellValue> => ({
-    starter: pick(byCode.starter),
-    growth: pick(byCode.growth),
-    pro: pick(byCode.pro),
-  });
+function buildCompareSections(plans: CatalogPlan[]): CompareSection[] {
+  const values = (pick: (plan: CatalogPlan) => CellValue): Record<string, CellValue> =>
+    Object.fromEntries(plans.map((plan) => [plan.code, pick(plan)]));
 
   return [
     {
       title: 'Billing',
       rows: [
-        { label: 'Fast POS billing', values: bool(() => true) },
-        { label: 'Offline POS', values: bool(() => true) },
-        { label: 'Printer connection', values: bool(() => true) },
-        { label: 'Invoices', values: bool((p) => p.entitlements.invoices) },
+        { label: 'Fast POS billing', values: values(() => true) },
+        { label: 'Offline POS', values: values(() => true) },
+        { label: 'Printer connection', values: values(() => true) },
+        { label: 'Invoices', values: values((plan) => plan.entitlements.invoices) },
       ],
     },
     {
       title: 'Catalog',
       rows: [
-        { label: 'Max products', values: text(productsLabel) },
-        { label: 'Stock & inventory', values: bool(() => true) },
+        { label: 'Max products', values: values(productsLabel) },
+        { label: 'Stock & inventory', values: values(() => true) },
       ],
     },
     {
@@ -60,28 +50,26 @@ function buildCompareSections(plans: Plan[]): CompareSection[] {
       rows: [
         {
           label: 'Stores',
-          values: text((p) => String(p.entitlements.maxStores)),
+          values: values((plan) => String(plan.entitlements.maxStores)),
         },
         {
           label: 'Staff',
-          values: text((p) => String(p.entitlements.maxStaff)),
+          values: values((plan) => String(plan.entitlements.maxStaff)),
         },
       ],
     },
     {
       title: 'Insights & support',
       rows: [
-        { label: 'Analytics', values: bool((p) => p.entitlements.analytics) },
+        { label: 'Analytics', values: values((plan) => plan.entitlements.analytics) },
         {
           label: 'Priority support',
-          values: bool((p) => p.entitlements.prioritySupport),
+          values: values((plan) => plan.entitlements.prioritySupport),
         },
       ],
     },
   ];
 }
-
-const COMPARE_SECTIONS = buildCompareSections(PLANS);
 
 function FeatureIcon({ included }: { included: boolean }) {
   return (
@@ -108,10 +96,29 @@ function Cell({ value }: { value: CellValue }) {
 
 export function Pricing() {
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<PlanCode>('growth');
+  const [plans, setPlans] = useState<CatalogPlan[]>(() => localCatalogPlans());
+  const [selected, setSelected] = useState('growth');
   const { ref, isVisible } = useScrollReveal<HTMLElement>();
+  const sections = buildCompareSections(plans);
+  const rowStyle = {
+    gridTemplateColumns: `minmax(180px, 1.2fr) repeat(${Math.max(plans.length, 1)}, minmax(140px, 1fr))`,
+  };
 
-  function goCheckout(code: PlanCode) {
+  useEffect(() => {
+    let active = true;
+    void loadCatalogPlans().then((next) => {
+      if (!active || !next.length) return;
+      setPlans(next);
+      setSelected((current) =>
+        next.some((plan) => plan.code === current) ? current : (next.find((plan) => plan.recommended)?.code ?? next[0].code),
+      );
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  function goCheckout(code: string) {
     setSelected(code);
     navigate(`/checkout?plan=${code}`);
   }
@@ -133,9 +140,9 @@ export function Pricing() {
 
         <div className="compare-scroll">
           <div className="compare-table" role="table" aria-label="Plan feature comparison">
-            <div className="compare-row compare-headers" role="row">
+            <div className="compare-row compare-headers" role="row" style={rowStyle}>
               <div className="compare-feature-col" role="columnheader" />
-              {PLANS.map((p) => {
+              {plans.map((p) => {
                 const active = p.code === selected;
                 return (
                   <div
@@ -146,7 +153,7 @@ export function Pricing() {
                     {p.recommended ? <span className="plan-badge">Recommended</span> : null}
                     <span className="plan-name">{p.name}</span>
                     <span className="plan-price">
-                      {formatInr(p.priceInr)}
+                      {formatPaise(p.pricePaise)}
                       <small>/mo</small>
                     </span>
                     <p className="plan-blurb">{p.blurb}</p>
@@ -162,22 +169,22 @@ export function Pricing() {
               })}
             </div>
 
-            {COMPARE_SECTIONS.map((section) => (
+            {sections.map((section) => (
               <div key={section.title} className="compare-section">
-                <div className="compare-row compare-section-title" role="row">
+                <div className="compare-row compare-section-title" role="row" style={rowStyle}>
                   <div className="compare-feature-col" role="cell">
                     <strong>{section.title}</strong>
                   </div>
-                  {PLANS.map((p) => (
+                  {plans.map((p) => (
                     <div key={p.code} className="compare-cell" role="cell" />
                   ))}
                 </div>
                 {section.rows.map((row) => (
-                  <div key={row.label} className="compare-row" role="row">
+                  <div key={row.label} className="compare-row" role="row" style={rowStyle}>
                     <div className="compare-feature-col" role="rowheader">
                       {row.label}
                     </div>
-                    {PLANS.map((p) => (
+                    {plans.map((p) => (
                       <div key={p.code} className="compare-cell" role="cell">
                         <Cell value={row.values[p.code]} />
                       </div>

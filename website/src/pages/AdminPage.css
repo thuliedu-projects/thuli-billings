@@ -1,0 +1,146 @@
+.admin-gate {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.admin-stats div {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.admin-stats p,
+.admin-stats span {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-stats strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--purple-dark);
+  font-size: 1.25rem;
+}
+
+.admin-stats span {
+  display: block;
+  margin-top: 4px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 600;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  margin-top: 12px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.admin-table th,
+.admin-table td {
+  text-align: left;
+  padding: 10px 8px;
+  border-top: 1px solid var(--border);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.admin-table th {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-table .dash-pill {
+  margin-left: 8px;
+}
+
+.admin-plan-card {
+  display: grid;
+  gap: 12px;
+  align-items: start;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+}
+
+.admin-plan-card.is-recommended {
+  background: var(--purple-soft);
+}
+
+.admin-plan-card label {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  color: var(--purple-dark);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.admin-plan-card input,
+.admin-plan-card textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--white);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+}
+
+.admin-plan-card textarea {
+  resize: vertical;
+}
+
+.admin-plan-card input:focus,
+.admin-plan-card textarea:focus {
+  outline: 2px solid var(--purple);
+  border-color: var(--purple);
+}
+
+.admin-plan-card .dash-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-plan-card .dash-check input {
+  width: auto;
+}
+
+.admin-span-2 {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 801px) {
+  .admin-plan-card {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-plan-card .dash-kicker,
+  .admin-plan-card .dash-button,
+  .admin-plan-card .dash-note,
+  .admin-plan-card .admin-span-2 {
+    grid-column: 1 / -1;
+  }
+}

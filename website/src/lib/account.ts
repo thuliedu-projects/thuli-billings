@@ -130,7 +130,7 @@ const EMPTY_ACCOUNT: AccountSnapshot = {
   orgs: [],
   payments: [],
   stores: [],
-  plans: PLANS.map(catalogFromLocal),
+  plans: localCatalogPlans(),
   staffSeatsByOrg: {},
 };
 
@@ -244,6 +244,10 @@ export async function updateStore(storeId: string, orgId: string, input: StoreIn
   if (error) throw new Error(storeErrorMessage(error.message));
 }
 
+export function localCatalogPlans(): CatalogPlan[] {
+  return PLANS.map(catalogFromLocal);
+}
+
 function catalogFromLocal(plan: Plan): CatalogPlan {
   return {
     code: plan.code,
@@ -274,36 +278,37 @@ function entitlementsFromRow(row: {
   };
 }
 
-async function loadCatalogPlans(): Promise<CatalogPlan[]> {
-  if (!supabase) return PLANS.map(catalogFromLocal);
+export async function loadCatalogPlans(): Promise<CatalogPlan[]> {
+  if (!supabase) return localCatalogPlans();
   const { data, error } = await supabase
     .from('plans')
     .select(
       `
-      code, name, price_paise, interval, sort_order, is_active,
+      code, name, price_paise, interval, sort_order, is_active, blurb, recommended,
       plan_entitlements ( max_stores, max_staff, max_products, analytics, invoices, priority_support )
     `,
     )
     .eq('is_active', true)
     .order('sort_order');
 
-  if (error || !data?.length) return PLANS.map(catalogFromLocal);
+  if (error || !data?.length) return localCatalogPlans();
 
   const plans: CatalogPlan[] = [];
   for (const row of data) {
     const local = PLANS.find((plan) => plan.code === row.code);
     const entitlements = one(row.plan_entitlements as EntitlementJoin | EntitlementJoin[] | null);
+    const blurb = typeof row.blurb === 'string' && row.blurb.trim() ? row.blurb : (local?.blurb ?? '');
     plans.push({
       code: row.code as string,
       name: row.name as string,
       pricePaise: row.price_paise as number,
       interval: row.interval as string,
-      blurb: local?.blurb ?? '',
-      recommended: Boolean(local?.recommended),
+      blurb,
+      recommended: typeof row.recommended === 'boolean' ? row.recommended : Boolean(local?.recommended),
       entitlements: entitlements ? entitlementsFromRow(entitlements) : catalogFromLocal(local ?? PLANS[0]).entitlements,
     });
   }
-  return plans.length ? plans : PLANS.map(catalogFromLocal);
+  return plans.length ? plans : localCatalogPlans();
 }
 
 async function loadPayments(orgIds: string[]): Promise<PaymentRow[]> {

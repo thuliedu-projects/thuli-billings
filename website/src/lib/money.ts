@@ -7,6 +7,15 @@ export function formatPaise(paise: number | null | undefined): string {
   }).format(paise / 100);
 }
 
+export function formatRupees(amount: number | null | undefined): string {
+  if (amount == null || Number.isNaN(amount)) return '—';
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+  }).format(amount);
+}
+
 export function formatWhen(iso: string | null | undefined): string {
   if (!iso) return '—';
   const date = new Date(iso);

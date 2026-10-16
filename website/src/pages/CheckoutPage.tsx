@@ -4,8 +4,10 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { BrandLogo } from '../components/BrandLogo';
 import { PhoneOtpForm } from '../components/PhoneOtpForm';
-import { PLANS, formatInr, type PlanCode } from '../data/plans';
+import { type PlanCode } from '../data/plans';
+import { loadCatalogPlans, localCatalogPlans, type CatalogPlan } from '../lib/account';
 import { functionErrorMessage } from '../lib/functions';
+import { formatPaise } from '../lib/money';
 import { formatIndiaPhone } from '../lib/phone';
 import { openRazorpay } from '../lib/razorpay';
 import { supabase } from '../lib/supabase';
@@ -19,41 +21,33 @@ export function CheckoutPage() {
   const { ready, session, signOut } = useAuth();
   const [params, setParams] = useSearchParams();
   const planParam = params.get('plan');
-  const selected: PlanCode = isPlanCode(planParam) ? planParam : 'growth';
-
+  const [catalog, setCatalog] = useState<CatalogPlan[]>(() => localCatalogPlans());
   const [error, setError] = useState('');
   const [paying, setPaying] = useState(false);
   const [paid, setPaid] = useState(false);
-  const [dbPrices, setDbPrices] = useState<Partial<Record<PlanCode, number>>>({});
 
-  const plan = useMemo(() => PLANS.find((item) => item.code === selected)!, [selected]);
-  const priceInr = dbPrices[selected] ?? plan.priceInr;
+  const selected = isPlanCode(planParam) ? planParam : (catalog.find((item) => item.recommended)?.code ?? 'growth');
+  const plan = useMemo(() => catalog.find((item) => item.code === selected) ?? null, [catalog, selected]);
   const phoneLabel = formatIndiaPhone(session?.user.phone);
 
   useEffect(() => {
-    if (!session || !supabase) return;
-    void supabase
-      .from('plans')
-      .select('code, price_paise')
-      .then(({ data }) => {
-        const next: Partial<Record<PlanCode, number>> = {};
-        for (const row of data ?? []) {
-          const code = row.code as string;
-          const paise = row.price_paise as number;
-          if (isPlanCode(code) && paise > 0) next[code] = Math.round(paise / 100);
-        }
-        setDbPrices(next);
-      });
-  }, [session]);
+    let active = true;
+    void loadCatalogPlans().then((next) => {
+      if (active && next.length) setCatalog(next);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
-  function setPlan(code: PlanCode) {
+  function setPlan(code: string) {
     setParams({ plan: code }, { replace: true });
     setError('');
     setPaid(false);
   }
 
   async function onPay() {
-    if (!supabase || !session) return;
+    if (!supabase || !session || !plan || !isPlanCode(plan.code)) return;
     setPaying(true);
     setError('');
     setPaid(false);
@@ -72,7 +66,7 @@ export function CheckoutPage() {
         orderId: data.orderId as string,
         amount: data.amount as number,
         currency: (data.currency as string) || 'INR',
-        description: `${data.planName ?? plan.name} plan`,
+        description: `${data.planName ?? plan?.name} plan`,
         contact: (data.phone as string) || session.user.phone || '',
       });
       const { error: confirmError } = await supabase.functions.invoke('confirm-razorpay-payment', {
@@ -105,7 +99,7 @@ export function CheckoutPage() {
         </p>
 
         <div className="checkout-plans" role="radiogroup" aria-label="Choose a plan">
-          {PLANS.map((item) => {
+          {catalog.map((item) => {
             const active = item.code === selected;
             return (
               <button
@@ -119,7 +113,7 @@ export function CheckoutPage() {
                 {item.recommended ? <span className="checkout-plan-badge">Recommended</span> : null}
                 <span className="checkout-plan-name">{item.name}</span>
                 <span className="checkout-plan-price">
-                  {formatInr(dbPrices[item.code] ?? item.priceInr)}
+                  {formatPaise(item.pricePaise)}
                   <small>/mo</small>
                 </span>
                 <span className="checkout-plan-blurb">{item.blurb}</span>
@@ -128,10 +122,14 @@ export function CheckoutPage() {
           })}
         </div>
 
-        {!ready ? null : session ? (
+        {!ready ? null : !plan ? (
+          <p className="checkout-error" role="alert">
+            That plan is not available. Choose another.
+          </p>
+        ) : session ? (
           <div className="checkout-form">
             <p className="checkout-paying">
-              Paying for <strong>{plan.name}</strong> — {formatInr(priceInr)}/month
+              Paying for <strong>{plan.name}</strong> — {formatPaise(plan.pricePaise)}/month
             </p>
             <p className="checkout-signed-in">
               Signed in as <strong>{phoneLabel || 'your mobile'}</strong>
@@ -140,8 +138,8 @@ export function CheckoutPage() {
                 Use a different number
               </button>
             </p>
-            <button type="button" className="checkout-pay" disabled={paying} onClick={() => void onPay()}>
-              {paying ? 'Opening payment…' : `Pay ${formatInr(priceInr)}`}
+            <button type="button" className="checkout-pay" disabled={paying || !isPlanCode(plan.code)} onClick={() => void onPay()}>
+              {paying ? 'Opening payment…' : `Pay ${formatPaise(plan.pricePaise)}`}
             </button>
             {error ? (
               <p className="checkout-error" role="alert">
@@ -162,7 +160,7 @@ export function CheckoutPage() {
         ) : (
           <>
             <p className="checkout-paying">
-              Paying for <strong>{plan.name}</strong> — {formatInr(priceInr)}/month
+              Paying for <strong>{plan.name}</strong> — {formatPaise(plan.pricePaise)}/month
             </p>
             <PhoneOtpForm
               onVerified={() => setError('')}

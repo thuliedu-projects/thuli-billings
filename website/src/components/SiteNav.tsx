@@ -1,11 +1,13 @@
 import { Link, NavLink } from 'react-router-dom';
 
 import { useAuth } from '../auth/AuthProvider';
+import { usePlatformAdmin } from '../hooks/usePlatformAdmin';
 import { BrandLogo } from './BrandLogo';
 import './SiteNav.css';
 
 export function SiteNav() {
   const { session } = useAuth();
+  const access = usePlatformAdmin(session?.user.id);
 
   return (
     <nav className="site-nav" aria-label="Account">
@@ -25,6 +27,11 @@ export function SiteNav() {
                 Log in
               </NavLink>
             )}
+            {access === 'yes' ? (
+              <NavLink to="/admin" className={({ isActive }) => (isActive ? 'active' : undefined)}>
+                Admin
+              </NavLink>
+            ) : null}
           </div>
         </div>
         <a className="site-nav-cta" href="/#pricing">
